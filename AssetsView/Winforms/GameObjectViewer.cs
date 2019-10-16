@@ -193,8 +193,8 @@ namespace AssetsView.Winforms
                         else if (evt == EnumValueTypes.ValueType_Array ||
                                  evt == EnumValueTypes.ValueType_ByteArray)
                         {
-                            PGProperty childProps = new PGProperty("child", null, $"[size: {atvfc.childrenCount}]");
-                            PGProperty prop = new PGProperty(atvfc.GetName(), childProps, $"[size: {atvfc.childrenCount}]");
+                            PGProperty childProps = new PGProperty("child", null, $"[ype: {atvfc.GetFieldType()} size: {atvfc.childrenCount}]");
+                            PGProperty prop = new PGProperty(atvfc.GetName(), childProps, $"[type: {atvf.GetFieldType()} size: {atvfc.childrenCount}]");
                             prop.category = category;
                             SetSelectedStateIfSelected(info, prop);
                             node.Add(prop);
@@ -204,7 +204,7 @@ namespace AssetsView.Winforms
                 }
                 else
                 {
-                    PGProperty childProps = new PGProperty("child");
+                    PGProperty childProps = new PGProperty("child", "", $"[type: {atvfc.GetFieldType()}");
                     PGProperty prop = new PGProperty(atvfc.GetName(), childProps);
                     prop.category = category;
                     SetSelectedStateIfSelected(info, prop);
@@ -239,7 +239,7 @@ namespace AssetsView.Winforms
                 AssetsManager.AssetExternal gameObjExt = helper.GetExtAsset(inst, newInstance.GetBaseField().Get("m_GameObject"));
                 AssetTypeInstance newAti = gameObjExt.instance;
                 AssetTypeValueField newBaseField = newAti.GetBaseField();
-                TreeNode newNode = node.Nodes.Add(newBaseField.Get("m_Name").GetValue().AsString());
+                TreeNode newNode = node.Nodes.Add(newBaseField.Get("m_Name").GetValue().AsString() + " (" + newBaseField.GetFieldType() + ")");
                 if (!newBaseField.Get("m_IsActive").GetValue().AsBool())
                     newNode.ForeColor = Color.DarkRed;
                 newNode.Tag = newBaseField;

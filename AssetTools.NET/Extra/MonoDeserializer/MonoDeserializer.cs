@@ -73,6 +73,7 @@ namespace AssetsTools.NET.Extra
         }
         private AssetTypeTemplateField[] RecursiveTypeLoad(ModuleDefinition module, TypeDefinition type, AssetTypeTemplateField[] attf)
         {
+            
             if (type.BaseType.Name != "Object" &&
                 type.BaseType.Name != "MonoBehaviour" &&
                 type.BaseType.Name != "ScriptableObject")
@@ -278,7 +279,7 @@ namespace AssetsTools.NET.Extra
             size.children = new AssetTypeTemplateField[] { };
 
             AssetTypeTemplateField data = new AssetTypeTemplateField();
-            data.name = string.Copy(field.name);
+            data.name = "data";
             data.type = string.Copy(field.type);
             data.valueType = field.valueType;
             data.isArray = false;
@@ -288,7 +289,7 @@ namespace AssetsTools.NET.Extra
             data.children = field.children;
 
             AssetTypeTemplateField array = new AssetTypeTemplateField();
-            array.name = string.Copy(field.name);
+            array.name = "Array";
             array.type = "Array";
             array.valueType = EnumValueTypes.ValueType_None;
             array.isArray = true;
@@ -298,8 +299,12 @@ namespace AssetsTools.NET.Extra
             array.children = new AssetTypeTemplateField[] {
                 size, data
             };
+            
+            AssetTypeTemplateField vector = CreateTemplateField(string.Copy(field.name), "vector", EnumValueTypes.ValueType_None, 1, new AssetTypeTemplateField[] {
+                array
+            });
 
-            return array;
+            return vector;
         }
         private void SetString(AssetTypeTemplateField field)
         {
