@@ -82,12 +82,13 @@ namespace UABE.NET.Winforms
         {
             AssetTypeInstance scriptAti = am.GetExtAsset(ati.GetBaseField().Get("m_Script")).instance;
             string scriptName = scriptAti.GetBaseField().Get("m_Name").GetValue().AsString();
+            string scriptNamespace = scriptAti.GetBaseField().Get("m_Namespace").GetValue().AsString();
             string assemblyName = scriptAti.GetBaseField().Get("m_AssemblyName").GetValue().AsString();
             string assemblyPath = Path.Combine(rootDir, "Managed", assemblyName);
             if (File.Exists(assemblyPath))
             {
                 MonoClass mc = new MonoClass();
-                mc.Read(scriptName, assemblyPath, af.header.format);
+                mc.Read(scriptName, scriptNamespace, assemblyPath, af.header.format);
                 return mc.children;
             }
             else

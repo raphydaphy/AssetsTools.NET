@@ -21,17 +21,16 @@ namespace AssetsTools.NET.Extra
         public uint childrenCount;
         public AssetTypeTemplateField[] children;
         private AssemblyDefinition assembly;
-        public bool Read(string typeName, string assemblyLocation, uint format)
+        public bool Read(string typeName, string scriptNamespace, string assemblyLocation, uint format)
         {
             this.format = format;
             DefaultAssemblyResolver resolver = new DefaultAssemblyResolver();
             resolver.AddSearchDirectory(Path.GetDirectoryName(assemblyLocation));
-            ReaderParameters readerParameters = new ReaderParameters();
-            readerParameters.AssemblyResolver = resolver;
+            ReaderParameters readerParameters = new ReaderParameters {AssemblyResolver = resolver};
             assembly = AssemblyDefinition.ReadAssembly(assemblyLocation, readerParameters);
 
             children = new AssetTypeTemplateField[] { };
-            children = RecursiveTypeLoad(assembly.MainModule, typeName, children);
+            children = RecursiveTypeLoad(assembly.MainModule, typeName, scriptNamespace, children);
             childrenCount = (uint)children.Length;
             return true;
         }
@@ -45,12 +44,13 @@ namespace AssetsTools.NET.Extra
             {
                 AssetTypeInstance scriptAti = am.GetExtAsset(inst, mainAti.GetBaseField().Get("m_Script")).instance;
                 string scriptName = scriptAti.GetBaseField().Get("m_Name").GetValue().AsString();
+                string scriptNamespace = scriptAti.GetBaseField().Get("m_Namespace").GetValue().AsString();
                 string assemblyName = scriptAti.GetBaseField().Get("m_AssemblyName").GetValue().AsString();
                 string assemblyPath = Path.Combine(managedPath, assemblyName);
                 if (File.Exists(assemblyPath))
                 {
                     MonoClass mc = new MonoClass();
-                    mc.Read(scriptName, assemblyPath, inst.file.header.format);
+                    mc.Read(scriptName, scriptNamespace, assemblyPath, inst.file.header.format);
                     AssetTypeTemplateField[] monoTemplateFields = mc.children;
 
                     AssetTypeTemplateField[] templateField = baseField.children.Concat(monoTemplateFields).ToArray();
@@ -62,10 +62,10 @@ namespace AssetsTools.NET.Extra
             }
             return mainAti.GetBaseField();
         }
-        private AssetTypeTemplateField[] RecursiveTypeLoad(ModuleDefinition module, string typeName, AssetTypeTemplateField[] attf)
+        private AssetTypeTemplateField[] RecursiveTypeLoad(ModuleDefinition module, string typeName, string typeNamespace, AssetTypeTemplateField[] attf)
         {
             TypeDefinition type = module.GetTypes()
-                .Where(t => t.Name.Equals(typeName))
+                .Where(t => (t.Name.Equals(typeName) && t.Namespace.Equals(typeNamespace)))
                 .Select(t => t)
                 .First();
 

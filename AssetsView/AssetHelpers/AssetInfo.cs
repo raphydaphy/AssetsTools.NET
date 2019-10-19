@@ -16,8 +16,10 @@ namespace AssetsView.AssetHelpers
             if (type.fields.Count == 0)
             {
                 return type.name.GetString(cldb);
-            }
-            else if (type.fields[1].fieldName.GetString(cldb) == "m_Name")
+            } else if (type.fields.Count == 1) {
+                // the dreamers lay sleeping to protect the vessel
+                return type.name.GetString(cldb);
+            } else if (type.fields[1].fieldName.GetString(cldb) == "m_Name")
             {
                 reader.Position = afi.absoluteFilePos;
                 return reader.ReadCountStringInt32();
